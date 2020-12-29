@@ -13,13 +13,79 @@ pip install fnsapi
 ```
 
 <br>
+
 Добавьте переменную окружения в своё виртуально окружение
 ```sh
 FNS_API_MASTER_TOKEN=master_token_from_fns
 ```
 
 <br>
+
 Если базовый адрес апи ФНС отличается от `https://openapi.nalog.ru:8090/`, то укажите его через перменную окружения
 ```sh
 FNS_API_BASE_URL=https://openapi.nalog.ru:8090/
+```
+
+## Принцип работы
+
+Чтобы запросить информацию о чеке в ФНС, нужно
+1. Получить токен сессии
+2. Сгенерерировать имя пользователя в вашей системе, от имени которого осуществляется запрос
+3. Вызвать функцию проверки чека или получения информации о чеке
+
+## Пример использования
+<br>
+Например, данные получены из qr-кода: `t=20201225T1016&s=1113.99&fn=9282440300829880&i=10556&fp=189504453&n=1`
+```
+t — timestamp, нужно переформатировать в %Y-%m-%dT%H:%M:%S
+s — sum, нужно умножить на  100
+fn - fiscal_number
+i - fiscal_document_id
+fp - fiscal_sign
+n - operation_type
+```
+
+<br>
+
+```python
+from fnsapi import api as fnsapi
+
+# получение сессионного токена
+session_token = get_session_token()
+user_id = 'ofd_user' # любое текстовое значение на ваш вкус
+
+# проверка существования чека
+result = fnsapi.check_ticket(
+    session_token, 
+    user_id, 
+    sum, # сумма чека в формате РРРКК, 12 рублей 23 копейки передавайте как 1223
+    timestamp, # дата и время в формате %Y-%m-%dT%H:%M:%S
+    fiscal_number, # код ККТ
+    operation_type, # тип операции
+    fiscal_document_id, # номер фискального документа
+    fiscal_sign # фискальный признак
+)
+
+# в результате придёт структура
+status = result['status'] # success, если апи фНС отработало запрос, еrror, если нет.
+code = result['code'] # код ошибки от апи ФНС.
+message= result['message'] # сообщение от ФНС.
+
+
+# получение информации о чеке
+result = fnsapi.get_ticket(
+    session_token, 
+    user_id, 
+    sum, # сумма чека в формате РРРКК, 12 рублей 23 копейки передавайте как 1223
+    timestamp, # дата и время в формате %Y-%m-%dT%H:%M:%S
+    fiscal_number, # код ККТ
+    operation_type, # тип операции
+    fiscal_document_id, # номер фискального документа
+    fiscal_sign # фискальный признак
+)
+
+# в результате придёт структура
+status = result['status'] # success, если апи фНС отработало запрос, еrror, если нет.
+code = result['code'] # код ошибки от апи ФНС.
+message= result['message'] # сообщение от ФНС в случае ошибки или JSON-строка с информацией о чеке.
 ```
