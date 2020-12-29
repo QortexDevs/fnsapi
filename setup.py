@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='fnsapi',
-    version='0.0.1',
+    version='0.0.2',
     author='Qortex Devs',
     author_email='it@qortex.ru',
     description='Russian Federal Tax Service API connector',
