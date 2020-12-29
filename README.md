@@ -48,14 +48,16 @@ n - operation_type
 <br>
 
 ```python
-from fnsapi import api as fnsapi
+from fnsapi.api import FNSApi
+
+fns_api = FNSApi()
 
 # получение сессионного токена
-session_token = get_session_token()
+session_token = fns_api.get_session_token()
 user_id = 'ofd_user' # любое текстовое значение на ваш вкус
 
 # проверка существования чека
-result = fnsapi.check_ticket(
+result = fns_api.check_ticket(
     session_token, 
     user_id, 
     sum, # сумма чека в формате РРРКК, 12 рублей 23 копейки передавайте как 1223
@@ -73,7 +75,7 @@ message= result['message'] # сообщение от ФНС.
 
 
 # получение информации о чеке
-result = fnsapi.get_ticket(
+result = fns_api.get_ticket(
     session_token, 
     user_id, 
     sum, # сумма чека в формате РРРКК, 12 рублей 23 копейки передавайте как 1223
